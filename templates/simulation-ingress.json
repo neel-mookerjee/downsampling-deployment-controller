@@ -1,0 +1,44 @@
+{
+  "apiVersion": "extensions/v1beta1",
+  "kind": "Ingress",
+  "metadata": {
+    "labels": {
+      "app": "{{ .StackName }}",
+      "purpose": "downsamplr-preview"
+    },
+    "name": "{{ .StackName }}",
+    "namespace": "testns"
+  },
+  "spec": {
+    "rules": [
+      {
+        "host": "{{ .StackName }}.r53.domain.net",
+        "http": {
+          "paths": [
+            {
+              "backend": {
+                "serviceName": "{{ .StackName }}",
+                "servicePort": 8086
+              },
+              "path": "/"
+            }
+          ]
+        }
+      },
+      {
+        "host": "{{ .StackName }}.grafana.r53.domain.net",
+        "http": {
+          "paths": [
+            {
+              "backend": {
+                "serviceName": "{{ .StackName }}",
+                "servicePort": 3000
+              },
+              "path": "/"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

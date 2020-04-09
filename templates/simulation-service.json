@@ -1,0 +1,31 @@
+{
+  "apiVersion": "v1",
+  "kind": "Service",
+  "metadata": {
+    "labels": {
+      "app": "{{ .StackName }}",
+      "purpose": "downsamplr-preview"
+    },
+    "name": "{{ .StackName }}",
+    "namespace": "testns"
+  },
+  "spec": {
+    "ports": [
+      {
+        "name": "influx",
+        "port": 8086,
+        "protocol": "TCP",
+        "targetPort": 8086
+      },
+      {
+        "name": "grafana",
+        "port": 3000,
+        "protocol": "TCP",
+        "targetPort": 3000
+      }
+    ],
+    "selector": {
+      "app": "{{ .StackName }}"
+    }
+  }
+}

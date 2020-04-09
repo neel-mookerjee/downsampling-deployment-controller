@@ -1,0 +1,103 @@
+{
+  "apiVersion": "batch/v1",
+  "kind": "Job",
+  "metadata": {
+    "name": "{{ .StackName }}"
+  },
+  "spec": {
+    "activeDeadlineSeconds": 240,
+    "template": {
+      "metadata": {
+        "name": "{{ .StackName }}",
+        "labels": {
+          "app": "{{ .StackName }}",
+          "purpose": "downsample-deployment-controller"
+        },
+        "annotations": {
+          "pod.alpha.kubernetes.io/initialized": "true",
+          "kube2iam.beta.arghanil.net/role": "{{ .Config.DeploymentConfig.AwsRole }}"
+        }
+      },
+      "spec": {
+        "restartPolicy": "OnFailure",
+        "serviceAccount": "metrics-downsample-preview",
+        "serviceAccountName": "metrics-downsample-preview",
+        "containers": [
+          {
+            "name": "controller",
+            "image": "{{ .Config.DeploymentConfig.Image }}",
+            "imagePullPolicy": "Always",
+            "command": [
+              "{{ .Command }}"
+            ],
+            "args": [
+              {{ .Argument }}
+            ],
+            "env": [
+              {
+                "name": "ENVIRONMENT",
+                "value": "{{ .Config.Environment }}"
+              },
+              {
+                "name": "DB_TABLE_PREFIX",
+                "value": "{{ .Config.DbTablePrefix }}"
+              },
+              {
+                "name": "NAMESPACE",
+                "value": "{{ .Config.Namespace }}"
+              },
+              {
+                "name": "EXPIRE_AFTER_MINUTE",
+                "value": "{{ .Config.ExpireAfterMinute }}"
+              },
+              {
+                "name": "FLINK_JARS_URL",
+                "value": "{{ .Config.FlinkConfig.FlinkJarsUrl }}"
+              },
+              {
+                "name": "FLINK_JOBS_URL",
+                "value": "{{ .Config.FlinkConfig.FlinkJobsUrl }}"
+              },
+              {
+                "name": "FLINK_JOB_DELETE_URL",
+                "value": "{{ .Config.FlinkConfig.FlinkJobDeleteUrl }}"
+              },
+              {
+                "name": "METRICS_HOST",
+                "value": "{{ .Config.MetricsConfig.Host }}"
+              },
+              {
+                "name": "METRICS_DATABASE",
+                "value": "{{ .Config.MetricsConfig.Database }}"
+              },
+              {
+                "name": "METRICS_USERNAME",
+                "value": "{{ .Config.MetricsConfig.Username }}"
+              },
+              {
+                "name": "METRICS_PASSWORD",
+                "value": "{{ .Config.MetricsConfig.Password }}"
+              },
+              {
+                "name": "SOURCE_CLUSTER",
+                "value": "{{ .Config.KafkaConfig.Source }}"
+              },
+              {
+                "name": "SINK_CLUSTER",
+                "value": "{{ .Config.KafkaConfig.Sink }}"
+              },
+              {
+                "name": "AWS_ROLE",
+                "value": "{{ .Config.DeploymentConfig.AwsRole }}"
+              },
+              {
+                "name": "POD_IMAGE",
+                "value": "{{ .Config.DeploymentConfig.Image }}"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

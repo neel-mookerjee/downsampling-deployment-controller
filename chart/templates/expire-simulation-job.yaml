@@ -1,0 +1,64 @@
+---
+apiVersion: batch/v2alpha1
+kind: CronJob
+metadata:
+  name: {{ .Release.Name }}-expire
+spec:
+  schedule: "*/15 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 60
+      template:
+        metadata:
+          name: {{ .Release.Name }}-expire
+          labels:
+            app: {{ .Release.Name }}-expire
+          annotations:
+            pod.alpha.kubernetes.io/initialized: "true"
+            kube2iam.beta.arghanil.net/role: {{ .Values.aws.role }}
+        spec:
+          restartPolicy: OnFailure
+          serviceAccount: metrics-downsample-preview
+          serviceAccountName: metrics-downsample-preview
+          containers:
+            - name: controller
+              image: {{ .Values.pod.image }}
+              imagePullPolicy: Always
+              command: ["./main"]
+              args: ["in-cluster","expire"]
+#              command: ["sleep"]
+#              args: ["900"]
+              env:
+                - name: ENVIRONMENT
+                  value: "{{ .Values.global.env }}"
+                - name: DB_TABLE_PREFIX
+                  value: "{{ .Values.global.db_table_prefix }}"
+                - name: NAMESPACE
+                  value: "{{ .Values.global.namespace }}"
+                - name: EXPIRE_AFTER_MINUTE
+                  value: "{{ .Values.query.expire_after_minute }}"
+                - name: FLINK_JARS_URL
+                  value: "{{ .Values.flink.flink_jars_url }}"
+                - name: FLINK_JOBS_URL
+                  value: "{{ .Values.flink.flink_jobs_url }}"
+                - name: FLINK_JOB_DELETE_URL
+                  value: "{{ .Values.flink.flink_job_delete_url }}"
+                - name: METRICS_HOST
+                  value : "{{ .Values.metrics.host }}"
+                - name: METRICS_DATABASE
+                  value : "{{ .Values.metrics.database }}"
+                - name: METRICS_USERNAME
+                  value : "{{ .Values.metrics.username }}"
+                - name: METRICS_PASSWORD
+                  value : "{{ .Values.metrics.password }}"
+                - name: SOURCE_CLUSTER
+                  value : "{{ .Values.kafka.source_cluster }}"
+                - name: SINK_CLUSTER
+                  value : "{{ .Values.kafka.sink_cluster }}"
+                - name: AWS_ROLE
+                  value : "{{ .Values.aws.role }}"
+                - name: POD_IMAGE
+                  value : "{{ .Values.pod.image }}"

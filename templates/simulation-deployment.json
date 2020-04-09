@@ -1,0 +1,39 @@
+{
+  "apiVersion": "apps/v1beta1",
+  "kind": "Deployment",
+  "metadata": {
+    "name": "{{ .StackName }}",
+    "namespace": "testns"
+  },
+  "spec": {
+    "replicas": 1,
+    "template": {
+      "metadata": {
+        "labels": {
+          "app": "{{ .StackName }}",
+          "purpose": "downsamplr-preview"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "image": "influxdb",
+            "imagePullPolicy": "Always",
+            "name": "influxdb"
+          },
+          {
+            "env": [
+              {
+                "name": "GF_SECURITY_ADMIN_PASSWORD",
+                "value": "admin"
+              }
+            ],
+            "image": "grafana/grafana:4.5.2",
+            "imagePullPolicy": "Always",
+            "name": "grafana"
+          }
+        ]
+      }
+    }
+  }
+}

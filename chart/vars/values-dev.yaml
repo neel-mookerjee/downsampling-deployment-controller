@@ -1,0 +1,28 @@
+global:
+  env: dev
+  db_table_prefix: "dev."
+  namespace: testns
+
+pod:
+  image: 12345678901.dkr.ecr.us-west-2.amazonaws.com/deployment-controller:dev
+
+aws:
+  role: arn:aws:iam::12345678901:role/testns/k8s/platform
+
+query:
+  expire_after_minute: 45
+
+flink:
+  flink_jobs_url: http://flink.r53.domain.net/joboverview/running
+  flink_job_delete_url: http://flink.r53.domain.net/jobs
+  flink_jars_url: http://flink.r53.domain.net/jars/
+
+kafka:
+  source_cluster: kafka.r53.domain.net:9092
+  sink_cluster: kafka.r53.domain.net:9092
+
+metrics:
+  host: http://influxdb.r53.domain.net:8086
+  database: commondb
+  username: admin
+  password: admin
